@@ -9,11 +9,13 @@
  */
 
 import { colors } from './tokens/colors';
+import { glass } from './tokens/glass';
 import { radius, size, spacing } from './tokens/spacing';
 import { typography } from './tokens/typography';
 
 export const theme = {
   colors,
+  glass,
   typography,
   spacing,
   radius,

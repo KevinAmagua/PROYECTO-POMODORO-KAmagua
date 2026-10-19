@@ -3,7 +3,6 @@ import { TimerManager } from '../timer-manager';
 import type { Scheduler } from '../timer-manager';
 import type { SessionStore } from '../session-store';
 import type { PhaseAlarm, PhaseAlarmPayload } from '../phase-alarm';
-import type { CountdownDisplay } from '../countdown-display';
 import { SESSION_SCHEMA_VERSION, SessionStatus, TimerPhase } from '../../types';
 import type { PersistentSession, TimerConfig } from '../../types';
 import type { PhaseCompletion } from '../../domain';
@@ -71,19 +70,6 @@ class FakePhaseAlarm implements PhaseAlarm {
   }
 }
 
-class FakeCountdownDisplay implements CountdownDisplay {
-  shown: { endTimestamp: number; phase: TimerPhase }[] = [];
-  hideCalls = 0;
-
-  async show(endTimestamp: number, phase: TimerPhase): Promise<void> {
-    this.shown.push({ endTimestamp, phase });
-  }
-
-  async hide(): Promise<void> {
-    this.hideCalls += 1;
-  }
-}
-
 function makeSession(overrides: Partial<PersistentSession> = {}): PersistentSession {
   return {
     sessionStartTimestamp: 0,
@@ -105,14 +91,12 @@ function setup(initialNow = 0) {
   const scheduler = new FakeScheduler();
   const store = new InMemorySessionStore();
   const alarm = new FakePhaseAlarm();
-  const countdown = new FakeCountdownDisplay();
   const completions: PhaseCompletion[] = [];
   const timer = new TimerManager({ config, clock: () => now, scheduler });
   const manager = new SessionManager({
     timer,
     store,
     alarm,
-    countdown,
     clock: () => now,
     onPhaseCompleted: (completion) => completions.push(completion),
   });
@@ -121,7 +105,6 @@ function setup(initialNow = 0) {
     timer,
     store,
     alarm,
-    countdown,
     scheduler,
     completions,
     advance: (ms: number) => {
@@ -301,62 +284,6 @@ describe('SessionManager', () => {
         title: 'Descanso terminado',
         body: 'Es hora de volver al estudio.',
       });
-    });
-  });
-
-  describe('contador en vivo (HU-007)', () => {
-    it('muestra el contador al iniciar y al reanudar con el fin de fase', async () => {
-      const { manager, countdown, advance } = setup(1000);
-      await manager.start();
-      expect(countdown.shown).toEqual([
-        { endTimestamp: 6000, phase: TimerPhase.Study },
-      ]);
-
-      advance(2000);
-      await manager.pause();
-      advance(1000);
-      await manager.resume();
-      expect(countdown.shown).toHaveLength(2);
-      expect(countdown.shown[1]).toEqual({ endTimestamp: 7000, phase: TimerPhase.Study });
-    });
-
-    it('oculta el contador al pausar, reiniciar y completar una fase', async () => {
-      const { manager, countdown, scheduler, advance } = setup(0);
-      await manager.start();
-
-      await manager.pause();
-      expect(countdown.hideCalls).toBe(1);
-
-      await manager.resume();
-      await manager.reset();
-      expect(countdown.hideCalls).toBe(2);
-
-      await manager.start();
-      advance(config.studySeconds * 1000);
-      scheduler.tickAll();
-      await flush();
-      expect(countdown.hideCalls).toBe(3);
-    });
-
-    it('muestra el contador al restaurar una sesión en marcha', async () => {
-      const { manager, store, countdown } = setup(0);
-      store.session = makeSession({ sessionEndTimestamp: 20_000, status: SessionStatus.Running });
-
-      await manager.restore();
-
-      expect(countdown.shown).toEqual([
-        { endTimestamp: 20_000, phase: TimerPhase.Study },
-      ]);
-    });
-
-    it('no muestra el contador si la fase expiró con la app cerrada', async () => {
-      const { manager, store, countdown } = setup(10_000);
-      store.session = makeSession({ sessionEndTimestamp: 1000, status: SessionStatus.Running });
-
-      await manager.restore();
-
-      expect(countdown.shown).toHaveLength(0);
-      expect(countdown.hideCalls).toBe(1);
     });
   });
 });

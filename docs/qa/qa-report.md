@@ -12,7 +12,7 @@
 
 | Comando | Resultado |
 | --- | --- |
-| `npx jest` | 17 suites · 110 tests · **OK** |
+| `npx jest` | 16 suites · 110 tests · **OK** |
 | `npx tsc --noEmit` | Sin errores · **OK** |
 | `npx expo lint` | 0 errores · 0 warnings · **OK** |
 | `npx expo-doctor` | 21/21 checks · **OK** |
@@ -28,9 +28,7 @@
 | SessionManager (rehidratación RUNNING/PAUSED/FINISHED) | `src/features/timer/application/__tests__/session-manager.test.ts` |
 | Alarmas (agendar/cancelar/reprogramar/verificar) | `src/infrastructure/notifications/__tests__/alarm-service.test.ts` |
 | Servicio de notificaciones (canal, permiso exacto, listado) | `src/infrastructure/notifications/__tests__/notification-service.test.ts` |
-| Contador en vivo — puerto + copys (HU-007) | `src/features/timer/application/__tests__/countdown-display.test.ts` |
-| Contador en vivo — servicio nativo (HU-007) | `src/infrastructure/notifications/__tests__/countdown-notification-service.test.ts` |
-| Ciclo de vida del contador en `SessionManager` | `src/features/timer/application/__tests__/session-manager.test.ts` |
+| Permisos de alarma exacta en JS (HU-004) | `src/infrastructure/notifications/__tests__/exact-alarm-permission.test.ts` |
 | Contenido de avisos por fase | `src/features/timer/application/__tests__/phase-alarm.test.ts` |
 | Config settings → motor | `src/features/timer/application/__tests__/config.test.ts` |
 | Etiquetas de fase/estado | `src/features/timer/application/__tests__/labels.test.ts` |
@@ -46,8 +44,7 @@
 | HU-002 | Estudio → corto; 4 → largo; descanso → estudio | ciclo completo en `pomodoro-engine` | M-05, M-06 |
 | HU-003 | Corrige con pantalla bloqueada / app cerrada | rehidratación y `now >= endTimestamp ⇒ FINISHED` en `session-manager` | M-07 … M-11 |
 | HU-004 | Aviso al terminar cada fase | `alarm-service`, alarmas en `session-manager`, `phase-alarm` | M-10, M-12 … M-14 |
-| HU-004 | Permiso de alarma exacta + aviso en Home | `notification-service` (exact-alarm), `pomodoro-services` | M-18 |
-| HU-007 | Contador en vivo en pantalla bloqueada | `countdown-display`, `countdown-notification-service`, `session-manager` | M-19 … M-21 |
+| HU-004 | Permiso de alarma exacta + aviso en Home | `exact-alarm-permission`, `notification-service`, `pomodoro-services` | M-18 |
 | HU-005 | Parámetros, validaciones y persistencia | `validation`, `settings-manager`, `config`, integración | M-15, M-16 |
 | HU-006 | Sin registro ni red | grep: sin `fetch`/`axios`/analytics ni deps de red en `src/` y `package.json` | M-17 |
 
@@ -80,7 +77,7 @@ Ninguno crítico o alto detectado en la capa automatizable. Observaciones:
 
 ## Conclusión
 
-La verificación automatizable está en verde (94 tests, `tsc`, `lint`) y cubre
+La verificación automatizable está en verde (110 tests, `tsc`, `lint`) y cubre
 las reglas de negocio de HU-001 … HU-006. La matriz manual se ejecuta en **Expo
 Go** para las filas funcionales; los escenarios de disparo exacto en segundo
 plano (M-10, M-12, M-14) quedan pendientes de un development build por las

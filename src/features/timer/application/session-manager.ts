@@ -5,7 +5,6 @@
  *  - restaura la sesión persistida al abrir la app (HU-003),
  *  - persiste tras cada cambio relevante (start/pause/resume/reset/fin de fase),
  *  - programa/cancela la alarma exacta de fin de fase (HU-004),
- *  - muestra/oculta el contador en vivo persistente (HU-007),
  *  - reenvía un callback opcional de fin de fase.
  *
  * La UI debe llamar a este manager (no al TimerManager directamente) para que la
@@ -17,8 +16,6 @@ import type { TimerListener, TimerManager } from './timer-manager';
 import type { SessionStore } from './session-store';
 import { noopPhaseAlarm, phaseNotification } from './phase-alarm';
 import type { PhaseAlarm } from './phase-alarm';
-import { noopCountdownDisplay } from './countdown-display';
-import type { CountdownDisplay } from './countdown-display';
 import { SessionStatus } from '../types';
 import type { SessionState } from '../types';
 
@@ -29,8 +26,6 @@ export interface SessionManagerOptions {
   clock?: () => number;
   /** Servicio de alarma; por defecto una implementación neutra (no-op). */
   alarm?: PhaseAlarm;
-  /** Contador en vivo (notificación persistente); por defecto no-op. */
-  countdown?: CountdownDisplay;
   /** Se invoca al completar una fase (enganche para notificaciones). */
   onPhaseCompleted?: (completion: PhaseCompletion) => void;
 }
@@ -51,7 +46,6 @@ export class SessionManager {
   private readonly store: SessionStore;
   private readonly clock: () => number;
   private readonly alarm: PhaseAlarm;
-  private readonly countdown: CountdownDisplay;
   private readonly onPhaseCompleted?: (completion: PhaseCompletion) => void;
 
   constructor(options: SessionManagerOptions) {
@@ -59,11 +53,9 @@ export class SessionManager {
     this.store = options.store;
     this.clock = options.clock ?? Date.now;
     this.alarm = options.alarm ?? noopPhaseAlarm;
-    this.countdown = options.countdown ?? noopCountdownDisplay;
     this.onPhaseCompleted = options.onPhaseCompleted;
     this.timer.setOnPhaseCompleted(async (completion) => {
       await this.persist();
-      await this.safeHideCountdown();
       this.onPhaseCompleted?.(completion);
     });
   }
@@ -88,9 +80,6 @@ export class SessionManager {
     await this.persist();
     if (completion === null && this.timer.getState().status === SessionStatus.Running) {
       await this.scheduleAlarm();
-      await this.showCountdown();
-    } else {
-      await this.safeHideCountdown();
     }
     return { restored: true, completion };
   }
@@ -99,28 +88,24 @@ export class SessionManager {
     this.timer.start();
     await this.persist();
     await this.scheduleAlarm();
-    await this.showCountdown();
   }
 
   async pause(): Promise<void> {
     this.timer.pause();
     await this.persist();
     await this.safeCancelAlarm();
-    await this.safeHideCountdown();
   }
 
   async resume(): Promise<void> {
     this.timer.resume();
     await this.persist();
     await this.scheduleAlarm();
-    await this.showCountdown();
   }
 
   async reset(): Promise<void> {
     this.timer.reset();
     await this.persist();
     await this.safeCancelAlarm();
-    await this.safeHideCountdown();
   }
 
   /** Detiene el temporizador y libera oyentes. */
@@ -149,30 +134,6 @@ export class SessionManager {
       await this.alarm.cancel();
     } catch {
       // Cancelación best-effort.
-    }
-  }
-
-  private async showCountdown(): Promise<void> {
-    const state = this.timer.getState();
-    if (state.status !== SessionStatus.Running) {
-      return;
-    }
-    const endTimestamp = this.timer.getEndTimestamp();
-    if (endTimestamp === null) {
-      return;
-    }
-    try {
-      await this.countdown.show(endTimestamp, state.currentPhase);
-    } catch {
-      // El contador en vivo es best-effort.
-    }
-  }
-
-  private async safeHideCountdown(): Promise<void> {
-    try {
-      await this.countdown.hide();
-    } catch {
-      // Ocultar el contador es best-effort.
     }
   }
 

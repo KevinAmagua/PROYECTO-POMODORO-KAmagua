@@ -11,6 +11,8 @@ export const STORAGE_KEYS = {
   userSettings: 'user_settings',
   /** Sesión activa (`PersistentSession`) para restaurar tras cerrar la app. */
   activeSession: 'active_session',
+  /** Indica que el usuario completó el flujo de ajustes de alarmas exactas (HU-004). */
+  exactAlarmPermissionRequested: 'exact_alarm_permission_requested',
 } as const;
 
 export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];

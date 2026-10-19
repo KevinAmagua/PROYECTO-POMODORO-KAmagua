@@ -65,30 +65,28 @@ el arranque con `Cannot find native module 'ExpoTopicSubscriptionModule'`.
 El cambio no altera contratos ni el comportamiento en un build con módulos nativos;
 el resto del veredicto (**APROBADO**) se mantiene.
 
-## Cambios posteriores (HU-004 fiabilidad + HU-007 contador en vivo)
+## Cambios posteriores (HU-004 fiabilidad)
 
-Se implementaron T-03..T-06 del plan `docs/plans/plan-notificaciones-cuenta-atras.md`:
-
-- Módulo nativo local `modules/pomodoro-countdown` (FGS `specialUse`) con cronómetro
-  descendente nativo; capa de dominio intacta (el servicio **solo visualiza**).
-- Nuevo puerto de aplicación `CountdownDisplay` (con `noopCountdownDisplay`) y su
-  implementación `CountdownNotificationService`; wiring best-effort en `SessionManager`.
 - `NotificationService` extendido (`canScheduleExactAlarms`, `requestExactAlarmsPermission`,
-  `listScheduled`); `AlarmService` verifica la alarma registrada (cierra el hallazgo
-  menor #1: ahora sí se guía al usuario a conceder el permiso).
+  `listScheduled`); `AlarmService` verifica la alarma registrada.
 - Aviso de permisos en Home vía `use-pomodoro`.
+- El permiso de alarma exacta se gestiona **100% en JS** con `expo-intent-launcher`
+  (`ExactAlarmPermission`, con heurística documentada en HU-004); sin código
+  nativo propio. La HU-007 (contador en vivo con el módulo nativo
+  `pomodoro-countdown`) fue **eliminada del alcance** y su código, módulo y
+  documentos se borraron por completo.
 
-**Estado del quality gate:** estos cambios **no han pasado aún una nueva revisión
-`reviewer`** ni el build EAS; el veredicto **APROBADO** corresponde al alcance
-anterior (HU-001..HU-006). Requiere re-revisión (T-08) antes del release.
+**Estado del quality gate:** la retirada de HU-007 y el enfoque JS de alarmas
+exactas **aún no han pasado una nueva revisión `reviewer`** ni el build EAS;
+requiere re-revisión antes del release.
 
-- **Evidencia local:** `tsc` 0 · `expo lint` 0/0 · `jest` 17 suites / 110 tests ·
-  `expo-doctor` 21/21 · autolinking detecta `pomodoro-countdown`.
+- **Evidencia local:** `tsc` 0 · `expo lint` 0/0 · `jest` en verde ·
+  `expo-doctor` 21/21.
 
 ## Conclusión
 
 El código revisado implementa exactamente las HU referenciadas, respeta la arquitectura
 por capas y la regla de tiempo por timestamps, y pasa todas las verificaciones
-automatizadas. **APROBADO** para release **del alcance HU-001..HU-006**; los cambios de
-HU-004/HU-007 y los escenarios de alarma exacta/segundo plano quedan sujetos a la nueva
-revisión (T-08), el build EAS y la matriz manual (M-10 … M-21).
+automatizadas. **APROBADO** para release **del alcance HU-001..HU-006**; los escenarios
+de alarma exacta/segundo plano quedan sujetos a la matriz manual (M-10, M-12, M-14,
+M-18) y a la re-revisión del cambio HU-004 en JS.

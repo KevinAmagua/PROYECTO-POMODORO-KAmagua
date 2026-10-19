@@ -27,7 +27,7 @@ Comandos ejecutados y resultado:
 | `npx expo-doctor` | **21/21 checks passed. No issues detected!** |
 | `npx expo lint` | 0 errores, 0 warnings |
 | `npx tsc --noEmit` | sin errores |
-| `npx jest` | 17 suites · 110 tests · OK |
+| `npx jest` | 16 suites · 110 tests · OK |
 
 ## Comandos de build
 
@@ -57,9 +57,8 @@ npx eas-cli@latest build --platform android --profile production
 - [x] Versión (`1.0.0`) y `versionCode` (`1`) definidos.
 - [x] Icono de notificación (`android-icon-monochrome.png`) y plugin `expo-notifications` configurados.
 - [x] Permisos Android declarados: `SCHEDULE_EXACT_ALARM`, `VIBRATE` (+ `POST_NOTIFICATIONS` y `RECEIVE_BOOT_COMPLETED` que añade el plugin).
-- [x] Permisos del módulo nativo `pomodoro-countdown`: `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_SPECIAL_USE`, `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALARM` (manifiesto del módulo, se fusiona en el build).
 - [ ] APK generado e **instalado/verificado** en dispositivo Android.
-- [ ] Matriz manual (`docs/qa/manual-test-matrix.md`) ejecutada sobre el build (incluye M-18 … M-21 de HU-007).
+- [ ] Matriz manual (`docs/qa/manual-test-matrix.md`) ejecutada sobre el build (incluye M-10, M-12, M-14, M-18).
 - [ ] Artefacto y comandos documentados.
 
 ## Versionado
@@ -84,14 +83,14 @@ el dispositivo, misma red local).
 | --- | --- |
 | M-01 … M-09, M-11, M-15 … M-17 | Verificable |
 | M-13 (prompt de permisos) | Verificable (el canal es el de Expo Go) |
-| M-10, M-12, M-14 (disparo exacto, reinicio, sonido/vibración en bloqueo) | No fiable → requiere build real |
+| M-10, M-12, M-14, M-18 (disparo exacto, reinicio, sonido/vibración en bloqueo, permiso de alarmas exactas) | No fiable → requiere build real |
 
 ## Estado actual
 
 Configuración de build **lista**; el **artefacto queda diferido** (no se genera
-APK/AAB todavía). A partir de HU-007 la verificación funcional **ya no puede
-hacerse en Expo Go** para los escenarios de contador en vivo y alarma exacta:
-la app incorpora el módulo nativo `pomodoro-countdown` (servicio en primer plano),
-así que requiere un **build nativo**. Pasos 1–4 de *Comandos de build* quedan
+APK/AAB todavía). Los escenarios de alarma exacta y disparo en segundo plano
+(M-10, M-12, M-14, M-18) no pueden verificarse en Expo Go: requieren un
+**build nativo** porque Expo Go no aplica `SCHEDULE_EXACT_ALARM` /
+`RECEIVE_BOOT_COMPLETED`. Pasos 1–4 de *Comandos de build* quedan
 **pendientes de credenciales de Expo**; una vez autenticado, `preview` produce un
-APK instalable para cerrar la matriz manual (M-10, M-12, M-14, M-18 … M-21).
+APK instalable para cerrar la matriz manual (M-10, M-12, M-14, M-18).

@@ -12,6 +12,3 @@ export type {
   ScheduleAtDateOptions,
 } from './notification-service';
 export { AlarmService } from './alarm-service';
-export { CountdownNotificationService } from './countdown-notification-service';
-export { pomodoroCountdownNative } from './pomodoro-countdown-native';
-export type { PomodoroCountdownNativeModule } from './pomodoro-countdown-native';

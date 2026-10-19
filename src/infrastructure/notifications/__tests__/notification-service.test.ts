@@ -48,9 +48,6 @@ jest.mock('expo-notifications/build/getAllScheduledNotificationsAsync', () => ({
 jest.mock('expo-notifications/build/NotificationsHandler', () => ({
   setNotificationHandler: jest.fn(),
 }));
-jest.mock('../pomodoro-countdown-native', () => ({
-  pomodoroCountdownNative: null,
-}));
 
 const channelMock = setNotificationChannelAsync as jest.Mock;
 const scheduleMock = scheduleNotificationAsync as jest.Mock;
@@ -172,8 +169,30 @@ describe('ExpoNotificationService', () => {
     await expect(service.listScheduled()).resolves.toEqual(['a', 'b']);
   });
 
-  it('degrada a no-op sin el módulo nativo (Expo Go)', async () => {
-    const service = new ExpoNotificationService();
+  it('delega la gestión de alarmas exactas en ExactAlarmPermission', async () => {
+    const exactAlarms = {
+      canSchedule: jest.fn(async () => false),
+      request: jest.fn(async () => undefined),
+    };
+    const service = new ExpoNotificationService(exactAlarms);
+
+    await expect(service.canScheduleExactAlarms()).resolves.toBe(false);
+    await service.requestExactAlarmsPermission();
+
+    expect(exactAlarms.canSchedule).toHaveBeenCalledTimes(1);
+    expect(exactAlarms.request).toHaveBeenCalledTimes(1);
+  });
+
+  it('degrada sin lanzar si la gestión de alarmas exactas falla', async () => {
+    const exactAlarms = {
+      canSchedule: jest.fn(async () => {
+        throw new Error('check failed');
+      }),
+      request: jest.fn(async () => {
+        throw new Error('request failed');
+      }),
+    };
+    const service = new ExpoNotificationService(exactAlarms);
 
     await expect(service.canScheduleExactAlarms()).resolves.toBe(true);
     await expect(service.requestExactAlarmsPermission()).resolves.toBeUndefined();

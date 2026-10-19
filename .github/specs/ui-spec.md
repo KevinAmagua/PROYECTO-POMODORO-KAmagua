@@ -8,6 +8,10 @@
 
 La interfaz debe ser minimalista.
 
+Estilo: glassmorfismo sutil (vidrio en tarjetas, fondo tenue de marca,
+controles sólidos). Reglas completas en
+`skills/build-ui/design-system/SKILL.md` (sección Glassmorphism).
+
 ## Colores Institucionales
 
 Fuente de verdad: `branding-spec.md`.

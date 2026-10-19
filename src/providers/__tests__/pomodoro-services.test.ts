@@ -10,7 +10,6 @@ import { cancelAllScheduledNotificationsAsync } from 'expo-notifications/build/c
 import { scheduleNotificationAsync } from 'expo-notifications/build/scheduleNotificationAsync';
 
 import { timerConfigFromSettings } from '@/features/timer/application';
-import { CountdownNotificationService } from '@/infrastructure/notifications';
 import {
   parseSession,
   parseUserSettings,
@@ -47,9 +46,6 @@ jest.mock('expo-notifications/build/cancelAllScheduledNotificationsAsync', () =>
 }));
 jest.mock('expo-notifications/build/getAllScheduledNotificationsAsync', () => ({
   getAllScheduledNotificationsAsync: jest.fn(async () => [{ identifier: 'notification-id' }]),
-}));
-jest.mock('@/infrastructure/notifications/pomodoro-countdown-native', () => ({
-  pomodoroCountdownNative: null,
 }));
 
 const scheduleMock = scheduleNotificationAsync as jest.Mock;
@@ -93,7 +89,6 @@ describe('createPomodoroServices (integración)', () => {
     const services = createServices();
 
     expect(services.settings.getSettings()).toEqual(DEFAULT_USER_SETTINGS);
-    expect(services.countdown).toBeInstanceOf(CountdownNotificationService);
     expect(services.session.getState()).toEqual({
       currentPhase: TimerPhase.Study,
       status: SessionStatus.Idle,

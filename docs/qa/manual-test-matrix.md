@@ -2,11 +2,10 @@
 
 > Ejecutar en **dispositivo Android físico**. Las filas funcionales
 > (M-01 … M-09, M-11, M-13, M-15 … M-17) se pueden verificar en **Expo Go**
-> (`npx expo start` + QR, sin APK). Las dependientes de alarma exacta, reinicio o
-> del contador en vivo (M-10, M-12, M-14, M-18 … M-21) requieren un **build
-> nativo** (`npx expo run:android` o `eas build --profile preview`), porque Expo
-> Go no aplica los permisos (`SCHEDULE_EXACT_ALARM` / `RECEIVE_BOOT_COMPLETED`) ni
-> incluye el módulo nativo `PomodoroCountdown` (servicio en primer plano).
+> (`npx expo start` + QR, sin APK). Las dependientes de alarma exacta o reinicio
+> (M-10, M-12, M-14, M-18) requieren un **build nativo**
+> (`npx expo run:android` o `eas build --profile preview`), porque Expo
+> Go no aplica los permisos (`SCHEDULE_EXACT_ALARM` / `RECEIVE_BOOT_COMPLETED`).
 >
 > Estado inicial de todas las filas: **Pendiente**. Anotar en "Resultado obtenido"
 > el valor real y marcar OK / FALLA.
@@ -31,9 +30,6 @@
 | M-16 | HU-005 | Rechazar inválidos | Dejar vacío / poner 0 / negativo | Mensaje por campo y **no** se guarda | — | Pendiente |
 | M-17 | HU-006 | Modo avión | Activar modo avión y usar la app completa | Todo funciona sin conexión | — | Pendiente |
 | M-18 | HU-004 | Permiso de alarma exacta | Android 14+, primer arranque sin el permiso | Home muestra la tarjeta "Activa las alarmas exactas"; al pulsar **Abrir ajustes** se abre el ajuste del sistema | — | Pendiente |
-| M-19 | HU-007 | Contador en vivo con la app abierta | Iniciar fase y bajar la bandeja de notificaciones | Notificación persistente con cuenta atrás (mm:ss) que disminuye cada segundo | — | Pendiente |
-| M-20 | HU-007 | Contador en vivo en pantalla bloqueada | Iniciar fase, bloquear la pantalla | El contador sigue visible y desciende en la pantalla bloqueada | — | Pendiente |
-| M-21 | HU-007 | Contador al pausar / reiniciar / terminar | Pausar; luego reanudar; luego reiniciar; esperar el fin de fase | La notificación persistente desaparece al pausar/reiniciar y reaparece al reanudar; desaparece al terminar | — | Pendiente |
 
 ## Evidencia
 

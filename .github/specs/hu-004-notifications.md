@@ -37,9 +37,12 @@ Causas probables, por orden:
    mata el proceso y sus alarmas al cerrar la app.
 
 Contradicción detectada y resuelta: el skill `mobile/local-notifications`
-referencia `getExactAlarmPermissionsAsync()` / `requestExactAlarmPermissionsAsync()`,
-pero **no existen en `expo-notifications@57.0.23`** (verificado por grep). El
-permiso de alarma exacta debe gestionarse por vía nativa (ver HU-007 / diseño).
+referencia `getExactAlarmPermissionsAsync()` / `requestExactAlarmPermissionsAsync`,
+pero **no existen en `expo-notifications@57.0.23`** (verificado por grep; llegaron
+en SDK 58). El permiso de alarma exacta se gestiona **100% en JS** con
+`expo-intent-launcher` en `ExactAlarmPermission`
+(`src/infrastructure/notifications/exact-alarm-permission.ts`), sin código nativo
+propio.
 
 ## Contexto (defecto reportado 2 — alerta perceptible)
 
@@ -82,7 +85,11 @@ abre la app al tocar el aviso. Causas (verificadas en el código nativo de
   falla en silencio.
 - **AC-6** Si `SCHEDULE_EXACT_ALARM` no está concedido, la app ofrece llevarte a
   la pantalla de ajustes del sistema para concederlo y registra/expone la
-  degradación a `bestEffort`.
+  degradación a `bestEffort`. **Nota (JS puro):** como JS no puede leer
+  `AlarmManager.canScheduleExactAlarms()`, en Android 14+ el permiso se asume
+  denegado hasta que el usuario completa el flujo de ajustes; si lo deniega o lo
+  revoca después, la app no puede detectarlo y degrada a alarma inexacta sin
+  aviso (limitación documentada de `ExactAlarmPermission`).
 - **AC-7** La app verifica que la alarma quedó registrada en el sistema; si no,
   lo informa (sin romper la UX).
 - **AC-8** El aviso **vibra** al dispararse (canal con `enableVibrate` y patrón).
@@ -102,7 +109,6 @@ abre la app al tocar el aviso. Causas (verificadas en el código nativo de
 ## Fuera de alcance
 
 - Notificaciones push remotas / red (HU-006).
-- El contador en vivo en pantalla bloqueada se especifica en **HU-007**.
 
 ## Dependencias
 
@@ -111,6 +117,6 @@ AlarmService
 
 ## Trazabilidad
 
-- Implementación actual: `src/infrastructure/notifications/*`,
+- Implementación actual: `src/infrastructure/notifications/*` (incluye
+  `exact-alarm-permission.ts`, gestión en JS del permiso de alarma exacta),
   `src/features/timer/application/session-manager.ts`.
-- Plan: `docs/plans/plan-notificaciones-cuenta-atras.md`.

@@ -35,11 +35,15 @@ Crear el canal **antes** de pedir permisos (en Android 13+ el prompt no aparece 
 
 - `requestPermissionsAsync()` para notificaciones (`POST_NOTIFICATIONS`).
 - **Alarma exacta (`SCHEDULE_EXACT_ALARM`, Android 12+):** `expo-notifications@57.0.23`
-  **no** expone API de permiso (`getExactAlarmPermissionsAsync` no existe; verificado).
-  Gestionar por vía nativa (módulo local / `Linking.sendIntent` a
-  `android.settings.REQUEST_SCHEDULE_EXACT_ALARM`) y degradar a `bestEffort`
-  (alarma inexacta) informando al usuario. Si el permiso está denegado,
-  `expo-notifications` cae en silencio a `setAndAllowWhileIdle` (inexacta).
+  **no** expone API de permiso (`getExactAlarmPermissionsAsync` no existe en SDK 57;
+  llegó en SDK 58). Gestionar **100% en JS** con `expo-intent-launcher`:
+  `IntentLauncher.startActivityAsync(ActivityAction.REQUEST_SCHEDULE_EXACT_ALARM)`
+  con `data: package:<app>` (sin `data` en Expo Go). Como JS no puede leer
+  `AlarmManager.canScheduleExactAlarms()`, aplicar la heurística de HU-004
+  (Android < 14: concedido por defecto; Android 14+: asumido tras completar el
+  flujo de ajustes — ver `ExactAlarmPermission`). Si el permiso está denegado,
+  `expo-notifications` cae en silencio a `setAndAllowWhileIdle` (inexacta):
+  degradar a `bestEffort` informando al usuario.
 
 ## Foreground vs background
 

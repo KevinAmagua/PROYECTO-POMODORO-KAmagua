@@ -10,6 +10,4 @@ export type { SessionManagerOptions, RestoreResult } from './session-manager';
 export type { SessionStore } from './session-store';
 export { noopPhaseAlarm, phaseNotification } from './phase-alarm';
 export type { PhaseAlarm, PhaseAlarmPayload } from './phase-alarm';
-export { noopCountdownDisplay, countdownNotification } from './countdown-display';
-export type { CountdownDisplay } from './countdown-display';
 export { phaseLabel, statusLabel } from './labels';

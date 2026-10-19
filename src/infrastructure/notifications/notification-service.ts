@@ -43,7 +43,7 @@ import type { NotificationAction, NotificationBehavior } from 'expo-notification
 import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { Platform } from 'react-native';
 
-import { pomodoroCountdownNative } from './pomodoro-countdown-native';
+import { ExactAlarmPermission, type ExactAlarmPermissionService } from './exact-alarm-permission';
 
 /**
  * Identificador del canal de Android.
@@ -114,6 +114,10 @@ export interface NotificationService {
 
 export class ExpoNotificationService implements NotificationService {
   private channelConfigured = false;
+
+  constructor(
+    private readonly exactAlarms: ExactAlarmPermissionService = new ExactAlarmPermission(),
+  ) {}
 
   async configure(): Promise<void> {
     setNotificationHandler({
@@ -205,22 +209,16 @@ export class ExpoNotificationService implements NotificationService {
   }
 
   async canScheduleExactAlarms(): Promise<boolean> {
-    if (pomodoroCountdownNative === null) {
-      return true;
-    }
     try {
-      return await pomodoroCountdownNative.canScheduleExactAlarms();
+      return await this.exactAlarms.canSchedule();
     } catch {
       return true;
     }
   }
 
   async requestExactAlarmsPermission(): Promise<void> {
-    if (pomodoroCountdownNative === null) {
-      return;
-    }
     try {
-      await pomodoroCountdownNative.requestExactAlarmPermission();
+      await this.exactAlarms.request();
     } catch {
       // La petición de permiso es best-effort.
     }

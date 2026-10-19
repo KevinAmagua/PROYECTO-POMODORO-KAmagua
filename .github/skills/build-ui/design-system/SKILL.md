@@ -325,6 +325,35 @@ SI usar:
 
 ---
 
+# Glassmorphism (estilo oficial)
+
+La app usa un glassmorfismo **sutil**, subordinado a todas las reglas de este
+skill:
+
+- **Superficies de vidrio:** la tarjeta base (`Card`) es vidrio: `BlurView`
+  (`expo-blur`) + velo blanco `glass.surface` (alfa ≥ 0.78) + filete
+  `glass.border` + sombra suave de la marca. El vidrio aplica solo a
+  **contenedores/superficies**.
+- **Controles de marca sólidos:** botones, `PhaseBadge` e indicadores de
+  pomodoro permanecen con color sólido institucional (el vidrio no se aplica a
+  controles interactivos ni a texto de marca).
+- **Tokens:** viven en `tokens/glass.ts`. Todos los tonos de vidrio se derivan
+  de la paleta oficial con alfa mediante `withAlpha`. **Prohibido** introducir
+  colores o tintes nuevos fuera de la paleta.
+- **Decoración de fondo:** como máximo dos manchas tenues **estáticas**
+  (azul ≤ 0.07 alfa, dorado ≤ 0.10 alfa). Sin gradientes agresivos, sin neón,
+  sin brillos/glow y sin animaciones decorativas (reglas de animación y
+  restricciones de diseño siguen vigentes). Las decoraciones no se colocan bajo
+  bloques de texto secundario.
+- **Contraste AA sobre el fondo efectivo:** con `glass.surface` en alfa ≥ 0.78
+  sobre fondo blanco, `text` y `textSecondary` cumplen AA; no bajar la alfa del
+  velo ni subir los tintes de decoración.
+- **Android:** blur estable con `BlurTargetView` (fondo) +
+  `blurMethod="dimezisBlurView"` en los `BlurView`; en Android sin método se
+  degrada a superficie semitransparente legible.
+
+---
+
 # Expected Output
 
 Cuando se diseñe una nueva pantalla:

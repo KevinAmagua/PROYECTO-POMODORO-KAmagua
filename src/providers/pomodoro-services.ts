@@ -9,16 +9,11 @@
 import { SessionManager, TimerManager, timerConfigFromSettings } from '@/features/timer/application';
 import { SettingsManager } from '@/features/settings/application';
 import { SessionRepository, SettingsRepository } from '@/infrastructure/storage';
-import {
-  AlarmService,
-  CountdownNotificationService,
-  ExpoNotificationService,
-} from '@/infrastructure/notifications';
+import { AlarmService, ExpoNotificationService } from '@/infrastructure/notifications';
 
 export interface PomodoroServices {
   notifications: ExpoNotificationService;
   alarm: AlarmService;
-  countdown: CountdownNotificationService;
   settings: SettingsManager;
   timer: TimerManager;
   session: SessionManager;
@@ -28,7 +23,6 @@ export interface PomodoroServices {
 export function createPomodoroServices(): PomodoroServices {
   const notifications = new ExpoNotificationService();
   const alarm = new AlarmService(notifications);
-  const countdown = new CountdownNotificationService();
   const settings = new SettingsManager({ store: new SettingsRepository() });
   const timer = new TimerManager({
     config: timerConfigFromSettings(settings.getSettings()),
@@ -37,8 +31,7 @@ export function createPomodoroServices(): PomodoroServices {
     timer,
     store: new SessionRepository(),
     alarm,
-    countdown,
   });
 
-  return { notifications, alarm, countdown, settings, timer, session };
+  return { notifications, alarm, settings, timer, session };
 }

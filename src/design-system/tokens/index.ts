@@ -13,3 +13,4 @@ export {
   type TypographyToken,
 } from './typography';
 export { spacing, radius, size, type SpacingToken } from './spacing';
+export { glass, withAlpha, type GlassToken } from './glass';

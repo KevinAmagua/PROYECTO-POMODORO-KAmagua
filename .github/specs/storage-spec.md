@@ -14,6 +14,10 @@ user_settings
 
 active_session
 
+### Permisos
+
+exact_alarm_permission_requested
+
 ## Requisitos
 
 - Recuperar sesión después de cerrar app.
